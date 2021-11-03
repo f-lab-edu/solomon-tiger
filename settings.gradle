@@ -1,0 +1,9 @@
+rootProject.name = 'solomon-tigger'
+include 'drawing'
+include 'product'
+include 'adaptor'
+include 'adaptor:domain'
+findProject(':adaptor:domain')?.name = 'domain'
+include 'adaptor:message'
+findProject(':adaptor:message')?.name = 'message'
+
