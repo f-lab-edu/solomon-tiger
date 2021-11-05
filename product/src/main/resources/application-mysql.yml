@@ -1,0 +1,4 @@
+datasource:
+  url: jdbc:mysql://localhost:3306/solomon_tigger?useSSL=false&useUnicode=true&characterEncoding=utf8
+  username: tigger
+  password: tigger1234
