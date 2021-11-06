@@ -1,7 +1,7 @@
 buildscript {
     ext {
         versions = [
-                lombok                    : '1.18.12',
+                lombok                    : '1.18.20',
                 springBoot                : '2.3.2.RELEASE',
                 springDependencyManagement: '1.0.9.RELEASE',
                 springCloudVersion        : 'Hoxton.SR6',
@@ -9,7 +9,8 @@ buildscript {
                 springCloudStreamVersion  : '3.0.7.RELEASE',
                 jackson                   : '2.11.2',
                 mysqlConnector            : '8.0.21',
-                commonLang3               : '3.11'
+                commonLang3               : '3.11',
+                springBootStarterTest     : '2.5.5'
         ]
     }
     repositories {
@@ -84,6 +85,8 @@ subprojects {
             // apache common
             dependency "org.apache.commons:commons-lang3:${versions.commonLang3}"
 
+            // spring-boot-starter-test
+            dependency "org.springframework.boot:spring-boot-starter-test:${versions.springBootStarterTest}"
         }
     }
 

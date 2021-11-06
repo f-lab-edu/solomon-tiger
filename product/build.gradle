@@ -4,7 +4,7 @@ tasks.jar {
 
 tasks.bootJar {
     enabled = true
-    mainClassName = "com.tigger.ProductApplication"
+    mainClassName = "com.tigger.product.ProductApplication"
 }
 
 repositories {
@@ -13,10 +13,7 @@ repositories {
 
 dependencies {
     api("org.springframework.boot:spring-boot-starter-web")
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.0'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
-    compileOnly "org.projectlombok:lombok:1.18.20"
-    annotationProcessor "org.projectlombok:lombok"
+    testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 
 test {
