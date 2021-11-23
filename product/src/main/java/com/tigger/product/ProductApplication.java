@@ -14,5 +14,6 @@ public class ProductApplication {
 
         log.info("test");
         log.info("branch test");
+        log.info("branch test after merge");
     }
 }
