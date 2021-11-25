@@ -2,19 +2,23 @@ package com.tigger.product.performance.service;
 
 import com.tigger.product.performance.dao.PerformanceMapper;
 import com.tigger.product.performance.dto.PerformanceDTO;
+import com.tigger.product.performance.enums.PerformanceFlag;
 import com.tigger.product.performance.exception.CustomRuntimeException;
 import com.tigger.product.performance.exception.DupPerformanceException;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.tigger.product.performance.exception.NonExistentPerformanceException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@RequiredArgsConstructor
 public class PerformanceService {
 
-    @Autowired
-    private PerformanceMapper pMapper;
+    private final PerformanceMapper pMapper;
 
     /**
      * 업체코드와 업체상품코드로 중복된 공연인지 체크한다
+     *
      * @param dto
      */
     public void chkDupPerformance(PerformanceDTO dto) {
@@ -26,6 +30,7 @@ public class PerformanceService {
 
     /**
      * 신규 공연 입력
+     *
      * @param performance
      */
     public void insertPerformance(PerformanceDTO performance) {
@@ -37,15 +42,21 @@ public class PerformanceService {
 
     /**
      * 공연 조회(id 기준)
+     *
      * @param id
      * @return
      */
     public PerformanceDTO getPerformanceById(int id) {
-        return pMapper.getById(id);
+        PerformanceDTO result = pMapper.getById(id);
+        if (result == null) {
+            throw new NonExistentPerformanceException();
+        }
+        return result;
     }
 
     /**
      * 공연 조회(공연명 기준)
+     *
      * @param name
      * @return
      */
@@ -54,13 +65,19 @@ public class PerformanceService {
     }
 
     /**
-     * 공연 삭제
+     * 공연 상태값 변경( 정상등록 -> 취소 )
+     *
      * @param id
      */
-    public void deletePerformance(int id) {
-        int result = pMapper.deletePerformance(id);
-        if (result == 0) {
-            throw new CustomRuntimeException("deletePerformance exception 발생");
+    @Transactional
+    public void updateFlag(int id) {
+        if (pMapper.getCurrentFlag(id).equals(PerformanceFlag.CANCEL.getValue())) {
+            throw new IllegalArgumentException("취소 공연 상태값 변경 불가");
         }
+        if (pMapper.chkExistPaymentCnt(id) > 0) {
+            throw new CustomRuntimeException("유효 결제건 존재하여 취소 불가");
+        }
+        pMapper.updateFlag(id); //해당 공연 취소
     }
+
 }

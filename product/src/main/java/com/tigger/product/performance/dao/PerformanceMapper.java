@@ -16,5 +16,9 @@ public interface PerformanceMapper {
 
     PerformanceDTO getByName(String name);
 
-    int deletePerformance(int id);
+    String getCurrentFlag(int id);
+
+    int chkExistPaymentCnt(int id);
+
+    void updateFlag(int id);
 }
