@@ -1,23 +1,15 @@
 package com.tigger.product.performance.enums;
 
-public enum PerformanceFlag implements EnumModel {
-    NORMAL("0"),
-    CANCEL("1"),
-    END("2");
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
+@Getter
+@AllArgsConstructor
+public enum PerformanceFlag {
+    NORMAL("정상공연","0"),
+    CANCEL("취소공연","1"),
+    END("종료공연","2");
+
+    private String status;
     private String value;
-
-    PerformanceFlag(String value) {
-        this.value = value;
-    }
-
-    @Override
-    public String getKey() {
-        return name();
-    }
-
-    @Override
-    public String getValue() {
-        return value;
-    }
 }
