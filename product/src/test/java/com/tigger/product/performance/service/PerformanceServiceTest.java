@@ -36,10 +36,6 @@ public class PerformanceServiceTest {
     PerformanceMapper pMapper;
     @InjectMocks
     PerformanceService pService;
-    @Mock
-    TimeTableMapper tMapper;
-    @InjectMocks
-    TimeTableService timeService;
 
     /*
         공연 등록
@@ -51,7 +47,7 @@ public class PerformanceServiceTest {
      */
 
     @Test
-    @DisplayName("공연 등록 예외1 (중복 공연 체크) : 중복공연 카운트 > 0 일 때, DupPerformanceException 발생시킨다")
+    @DisplayName("공연 등록 예외 (중복 공연 체크) : 중복공연 카운트 > 0 일 때, DupPerformanceException 발생시킨다")
     public void addDupPerformance() {
         int enterCode = performanceDTO.getEnterpriseCode();
         String pid = performanceDTO.getEnterprisePid();
@@ -74,22 +70,6 @@ public class PerformanceServiceTest {
 
         assertDoesNotThrow(() -> {
             pService.chkDupPerformance(performanceDTO);
-        });
-    }
-
-    @Test
-    @DisplayName("공연 등록 예외2 (중복 일시/장소 체크) : 중복 일시/장소 카운트 > 0 일 때, DupTimeAndVenueException 발생시킨다")
-    public void addDupTimeAndVenuePerformance() {
-        int venueCode = 1;
-        String date = "20211121";
-        int hour = 17;
-        int minute = 30;
-        int runningTime = 120;
-
-        when(tMapper.getDupTimeAndVenueCnt(anyInt(), anyString(), any(), any())).thenReturn(1);
-
-        assertThrows(DupTimeAndVenueException.class, () -> {
-            timeService.chkDupTimeAndVenue(venueCode, date, hour, minute, runningTime);
         });
     }
 
@@ -192,17 +172,6 @@ public class PerformanceServiceTest {
 
         assertThrows(CustomRuntimeException.class, () -> {
             pService.updateFlag(1);
-        });
-    }
-
-    @Test
-    @DisplayName("공연 특정 타임 상태값 변경시(정상 -> 취소), 결제 건수 있으면 예외 발생")
-    public void updateTimeFlag_결제_존재() {
-        when(tMapper.getCurrentFlag(anyInt())).thenReturn(PerformanceFlag.NORMAL.getValue());
-        when(tMapper.chkExistPaymentCnt(anyInt())).thenReturn(1);
-
-        assertThrows(CustomRuntimeException.class, () -> {
-            timeService.updateFlag(1);
         });
     }
 
