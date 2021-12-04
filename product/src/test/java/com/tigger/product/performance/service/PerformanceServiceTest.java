@@ -7,12 +7,10 @@ import static org.mockito.Mockito.when;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.tigger.product.performance.dao.PerformanceMapper;
-import com.tigger.product.performance.dao.TimeTableMapper;
 import com.tigger.product.performance.enums.PerformanceFlag;
 import com.tigger.product.performance.exception.DupPerformanceException;
 import com.tigger.product.performance.dto.PerformanceDTO;
 import com.tigger.product.performance.exception.CustomRuntimeException;
-import com.tigger.product.performance.exception.DupTimeAndVenueException;
 import com.tigger.product.performance.exception.NonExistentPerformanceException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -80,7 +78,7 @@ public class PerformanceServiceTest {
         when(pMapper.insertPerformance(any())).thenReturn(1);
 
         assertDoesNotThrow(() -> {
-            pService.insertPerformance(newDto);
+            pService.registerPerformance(newDto);
         });
     }
 
@@ -92,7 +90,7 @@ public class PerformanceServiceTest {
         when(pMapper.insertPerformance(any())).thenReturn(0);
 
         assertThrows(CustomRuntimeException.class, () -> {
-            pService.insertPerformance(newDto);
+            pService.registerPerformance(newDto);
         });
     }
 
