@@ -8,7 +8,6 @@ import com.tigger.product.performance.exception.DupPerformanceException;
 import com.tigger.product.performance.exception.NonExistentPerformanceException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -24,7 +23,7 @@ public class PerformanceService {
     public void chkDupPerformance(PerformanceDTO dto) {
         int dupCnt = pMapper.getDupPerformanceCnt(dto.getEnterpriseCode(), dto.getEnterprisePid());
         if (dupCnt > 0) {
-            throw new DupPerformanceException("중복된 공연이 존재합니다");
+            throw new DupPerformanceException();
         }
     }
 
@@ -33,10 +32,10 @@ public class PerformanceService {
      *
      * @param performance
      */
-    public void insertPerformance(PerformanceDTO performance) {
+    public void registerPerformance(PerformanceDTO performance) {
         int result = pMapper.insertPerformance(performance);
         if (result == 0) {
-            throw new CustomRuntimeException("insertPerformance exception 발생");
+            throw new CustomRuntimeException("registerPerformance exception 발생");
         }
     }
 
@@ -69,9 +68,8 @@ public class PerformanceService {
      *
      * @param id
      */
-    @Transactional
     public void updateFlag(int id) {
-        if (pMapper.getCurrentFlag(id).equals(PerformanceFlag.CANCEL.getValue())) {
+        if (PerformanceFlag.CANCEL.getValue().equals(pMapper.getCurrentFlag(id))) {
             throw new IllegalArgumentException("취소 공연 상태값 변경 불가");
         }
         if (pMapper.chkExistPaymentCnt(id) > 0) {
