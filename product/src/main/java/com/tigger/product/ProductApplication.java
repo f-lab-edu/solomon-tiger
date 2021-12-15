@@ -11,5 +11,9 @@ public class ProductApplication {
     public static void main(String[] args) {
         SpringApplication.run(ProductApplication.class, args);
         log.info("##########ProductApplication start!");
+
+        log.info("test");
+        log.info("branch test");
+        log.info("branch test after merge");
     }
 }
