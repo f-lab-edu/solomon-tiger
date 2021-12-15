@@ -6,4 +6,5 @@ include 'adaptor:domain'
 findProject(':adaptor:domain')?.name = 'domain'
 include 'adaptor:message'
 findProject(':adaptor:message')?.name = 'message'
+include 'test'
 
