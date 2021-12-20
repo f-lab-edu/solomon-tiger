@@ -1,7 +1,7 @@
 buildscript {
     ext {
         versions = [
-                lombok                    : '1.18.12',
+                lombok                    : '1.18.20',
                 springBoot                : '2.3.2.RELEASE',
                 springDependencyManagement: '1.0.9.RELEASE',
                 springCloudVersion        : 'Hoxton.SR6',
@@ -10,7 +10,8 @@ buildscript {
                 jackson                   : '2.11.2',
                 mysqlConnector            : '8.0.21',
                 commonLang3               : '3.11',
-                validation                : '2.6.0'
+                validation                : '2.6.0',
+                springBootStarterTest     : '2.5.5'
         ]
     }
     repositories {
@@ -87,6 +88,10 @@ subprojects {
 
             // validation
             dependency "org.springframework.boot:spring-boot-starter-validation:${versions.validation}"
+
+            // spring-boot-starter-test
+            dependency "org.springframework.boot:spring-boot-starter-test:${versions.springBootStarterTest}"
+
         }
     }
 
