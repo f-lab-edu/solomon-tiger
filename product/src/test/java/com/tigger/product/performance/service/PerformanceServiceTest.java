@@ -7,11 +7,13 @@ import static org.mockito.Mockito.when;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.tigger.product.performance.dao.PerformanceMapper;
-import com.tigger.product.performance.enums.PerformanceFlag;
+import com.tigger.product.performance.enums.PerformanceState;
 import com.tigger.product.performance.exception.DupPerformanceException;
 import com.tigger.product.performance.dto.PerformanceDTO;
 import com.tigger.product.performance.exception.CustomRuntimeException;
 import com.tigger.product.performance.exception.NonExistentPerformanceException;
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,8 +31,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 public class PerformanceServiceTest {
 
     @Mock
-    PerformanceDTO performanceDTO;
-    @Mock
     PerformanceMapper pMapper;
     @InjectMocks
     PerformanceService pService;
@@ -45,29 +45,27 @@ public class PerformanceServiceTest {
      */
 
     @Test
-    @DisplayName("공연 등록 예외 (중복 공연 체크) : 중복공연 카운트 > 0 일 때, DupPerformanceException 발생시킨다")
+    @DisplayName("공연 등록 예외 (중복 공연 체크) : null 이 아닌 업체코드와 업체상품코드로 중복공연 체크한 카운트가 0보다 크면, DupPerformanceException 발생시킨다")
     public void addDupPerformance() {
-        int enterCode = performanceDTO.getEnterpriseCode();
-        String pid = performanceDTO.getEnterprisePid();
+        PerformanceDTO dto = this.generatePerformance();
 
-        when(pMapper.getDupPerformanceCnt(enterCode, pid)).thenReturn(1);
+        when(this.pMapper.getDupPerformanceCnt(dto.getEnterpriseCode(), dto.getEnterprisePid())).thenReturn(1);
 
         assertThrows(DupPerformanceException.class, () -> {
-            pService.chkDupPerformance(performanceDTO);
+            this.pService.chkDupPerformance(dto);
         });
 
     }
 
     @Test
-    @DisplayName("공연 등록/수정 정상 : 중복공연 체크 카운트가 0 일 때 예외를 발생시키지 않는다")
+    @DisplayName("공연 등록/수정 정상 : null 이 아닌 업체코드와 업체상품코드로 중복공연 체크한 카운트가 0이면 예외를 발생시키지 않는다")
     public void addValidatedPerformance() {
-        int enterCode = performanceDTO.getEnterpriseCode();
-        String pid = performanceDTO.getEnterprisePid();
+        PerformanceDTO dto = this.generatePerformance();
 
-        when(pMapper.getDupPerformanceCnt(enterCode, pid)).thenReturn(0);
+        when(this.pMapper.getDupPerformanceCnt(dto.getEnterpriseCode(), dto.getEnterprisePid())).thenReturn(0);
 
         assertDoesNotThrow(() -> {
-            pService.chkDupPerformance(performanceDTO);
+            this.pService.chkDupPerformance(dto);
         });
     }
 
@@ -75,10 +73,10 @@ public class PerformanceServiceTest {
     public void insertPerformance_공연_등록_성공() {
         PerformanceDTO newDto = this.generatePerformance();
 
-        when(pMapper.insertPerformance(any())).thenReturn(1);
+        when(this.pMapper.insertPerformance(any())).thenReturn(1);
 
         assertDoesNotThrow(() -> {
-            pService.registerPerformance(newDto);
+            this.pService.registerPerformance(newDto);
         });
     }
 
@@ -87,10 +85,10 @@ public class PerformanceServiceTest {
     public void insertPerformance_공연_등록_실패() {
         PerformanceDTO newDto = this.generatePerformance();
 
-        when(pMapper.insertPerformance(any())).thenReturn(0);
+        when(this.pMapper.insertPerformance(any())).thenReturn(0);
 
         assertThrows(CustomRuntimeException.class, () -> {
-            pService.registerPerformance(newDto);
+            this.pService.registerPerformance(newDto);
         });
     }
 
@@ -107,9 +105,9 @@ public class PerformanceServiceTest {
     public void getPerformanceById_공연_조회_성공() {
         PerformanceDTO target = this.generatePerformance();
 
-        when(pMapper.getById(1)).thenReturn(target);
+        when(this.pMapper.getById(1)).thenReturn(target);
 
-        assertEquals(pService.getPerformanceById(1), target);
+        assertEquals(this.pService.getPerformanceById(1), target);
     }
 
     @Test
@@ -117,21 +115,22 @@ public class PerformanceServiceTest {
     public void getPerformanceById_공연_조회_실패() {
         PerformanceDTO targetInfo = this.generatePerformance();
 
-        when(pMapper.getById(999)).thenReturn(null);
+        when(this.pMapper.getById(999)).thenReturn(null);
 
         assertThrows(NonExistentPerformanceException.class, () -> {
-            pService.getPerformanceById(999);
+            this.pService.getPerformanceById(999);
         });
     }
 
     @Test
     @DisplayName("공연명 검색해서 공연 정보 조회")
     public void getPerformanceByName_공연_조회_성공() {
-        PerformanceDTO targetInfo = this.generatePerformance();
+        List<PerformanceDTO> list = new ArrayList<>();
+        list.add(this.generatePerformance());
 
-        when(pMapper.getByName("test")).thenReturn(targetInfo);
+        when(this.pMapper.getListByName("test")).thenReturn(list);
 
-        assertEquals(pService.getPerformanceByName("test"), targetInfo);
+        assertEquals(this.getPerformanceListByName("test").size(), 1);
     }
 
     @Test
@@ -139,9 +138,13 @@ public class PerformanceServiceTest {
     public void getPerformanceByName_공연_조회_결과없을때() {
         PerformanceDTO target = this.generatePerformance();
 
-        when(pMapper.getByName(anyString())).thenReturn(null);
+        when(this.pMapper.getListByName(anyString())).thenReturn(null);
 
-        assertNull(pService.getPerformanceByName("NonExistentPerformance"));
+        assertNull(this.getPerformanceListByName("NonExistentPerformance"));
+    }
+
+    private List<PerformanceDTO> getPerformanceListByName(String name) {
+        return this.pMapper.getListByName(name);
     }
 
     /*
@@ -150,35 +153,48 @@ public class PerformanceServiceTest {
         - 공연 상태값 변경시(취소 -> 정상), 예외 발생
         - 공연 특정 타임 상태값 변경시(정상 -> 취소), 결제 건수 있으면 예외 발생
         - 공연 상태값을 제외한 타 공연 정보 필드 변경시 validation 체크 없이 수정 성공
+        - 공연 상태값 변경이 제대로 이루어지지 않은 경우
      */
 
     @Test
     @DisplayName("공연 상태값 변경시(정상 에서 -> 취소 로), 결제 건수 있으면 예외 발생시킨다")
     public void updatePerformanceFlag_결제_존재() {
-        when(pMapper.getCurrentFlag(anyInt())).thenReturn(PerformanceFlag.NORMAL.getValue());
-        when(pMapper.chkExistPaymentCnt(anyInt())).thenReturn(1);
+        when(this.pMapper.getCurrentState(anyInt())).thenReturn(PerformanceState.NORMAL.getValue());
+        when(this.pMapper.chkExistPaymentCnt(anyInt())).thenReturn(1);
 
         assertThrows(CustomRuntimeException.class, () -> {
-            pService.updateFlag(1);
+            this.pService.updateState(1);
         });
     }
 
     @Test
     @DisplayName("취소 상태인 공연의 상태값 변경시, 예외 발생시킨다")
     public void updatePerformanceFlag_CancelToNormal() {
-        when(pMapper.getCurrentFlag(anyInt())).thenReturn(PerformanceFlag.CANCEL.getValue());
+        when(this.pMapper.getCurrentState(anyInt())).thenReturn(PerformanceState.CANCEL.getValue());
 
         assertThrows(CustomRuntimeException.class, () -> {
-            pService.updateFlag(1);
+            this.pService.updateState(1);
         });
     }
 
-    public PerformanceDTO generatePerformance() {
+    private PerformanceDTO generatePerformance() {
         PerformanceDTO newPerformanceDTO = PerformanceDTO.builder()
             .no(1)
             .name("test")
+            .categoryCode(101)
+            .enterpriseCode(11)
+            .enterprisePid("a11")
             .build();
         return newPerformanceDTO;
+    }
+
+    @Test
+    @DisplayName("updateState 결과 validation 체크")
+    public void validResultAfterUpdateState() {
+        when(this.pMapper.getCurrentState(anyInt())).thenReturn(PerformanceState.NORMAL.getValue());
+        assertThrows(CustomRuntimeException.class, () -> {
+            this.pService.updateState(1);
+        });
     }
 
 }

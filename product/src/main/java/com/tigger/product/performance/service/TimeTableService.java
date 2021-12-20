@@ -1,18 +1,22 @@
 package com.tigger.product.performance.service;
 
 import com.tigger.product.performance.dao.TimeTableMapper;
-import com.tigger.product.performance.enums.PerformanceFlag;
+import com.tigger.product.performance.dto.TimeTableDTO;
+import com.tigger.product.performance.enums.PerformanceState;
 import com.tigger.product.performance.exception.CustomRuntimeException;
 import com.tigger.product.performance.exception.DupTimeAndVenueException;
 import java.time.LocalTime;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 @Service
 @RequiredArgsConstructor
 public class TimeTableService {
 
     private final TimeTableMapper timeMapper;
+    private final PerformanceService pService;
 
     /**
      * 공연장소코드와 공연일자, 공연시작시간, 공연종료시간 데이터로 일시/장소에 대한 중복을 체크한다
@@ -30,7 +34,7 @@ public class TimeTableService {
          */
         LocalTime startTime = LocalTime.of(hour, minute);
         LocalTime endTime = startTime.plusMinutes(runningTime);
-        int dupCnt = timeMapper.getDupTimeAndVenueCnt(venueCode, date, startTime, endTime);
+        int dupCnt = this.timeMapper.getDupTimeAndVenueCnt(venueCode, date, startTime, endTime);
         if (dupCnt > 0) {
             throw new DupTimeAndVenueException();
         }
@@ -42,12 +46,14 @@ public class TimeTableService {
      * @param timeId
      */
     public void updateFlag(int timeId) {
-        if (timeMapper.getCurrentFlag(timeId).equals(PerformanceFlag.CANCEL.getValue())) {
+        if (this.timeMapper.getCurrentState(timeId).equals(PerformanceState.CANCEL.getValue())) {
             throw new IllegalArgumentException("취소 공연 상태값 변경 불가");
         }
-        if (timeMapper.chkExistPaymentCnt(timeId) > 0) {
+        if (this.timeMapper.chkExistPaymentCnt(timeId) > 0) {
             throw new CustomRuntimeException("유효 결제건 존재하여 취소 불가");
         }
-        timeMapper.updateFlag(timeId);
+        this.timeMapper.updateState(timeId);
     }
+
+
 }

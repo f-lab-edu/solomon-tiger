@@ -5,11 +5,11 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum PerformanceFlag {
+public enum PerformanceState {
     NORMAL("정상공연", "0"),
     CANCEL("취소공연", "1"),
     END("종료공연", "2");
 
-    private String status;
+    private String state;
     private String value;
 }

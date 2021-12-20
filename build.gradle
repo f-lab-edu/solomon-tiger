@@ -10,6 +10,7 @@ buildscript {
                 jackson                   : '2.11.2',
                 mysqlConnector            : '8.0.21',
                 commonLang3               : '3.11',
+                validation                : '2.6.0',
                 springBootStarterTest     : '2.5.5'
         ]
     }
@@ -85,8 +86,12 @@ subprojects {
             // apache common
             dependency "org.apache.commons:commons-lang3:${versions.commonLang3}"
 
+            // validation
+            dependency "org.springframework.boot:spring-boot-starter-validation:${versions.validation}"
+
             // spring-boot-starter-test
             dependency "org.springframework.boot:spring-boot-starter-test:${versions.springBootStarterTest}"
+
         }
     }
 
